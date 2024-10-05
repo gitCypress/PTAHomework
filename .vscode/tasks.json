@@ -7,7 +7,7 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${file}",
+                "${workspaceFolder}/src_PTA/3-Stack/3-7-3_NifixExpressionCalculation.cpp",
                 "-o",
                 "${workspaceFolder}/bin/${fileBasenameNoExtension}"
             ],
