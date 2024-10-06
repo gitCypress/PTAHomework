@@ -7,12 +7,17 @@
 #include <vector>
 #include <stack>
 #include <cctype>
+#include <climits>
+
+// 9+(3-1)*3+10/2
+// 931-3*+10/2
 
 using namespace std;
 
 vector<string> inputFormat(string& input);  // 格式化原始输入数据，分开符号和数字
 vector<string> nifixFormat(const vector<string>& input);  // 将中缀表达式转化为后缀表达式
 int postfixCalulate(vector<string> input);  // 计算后缀表达式
+int powerCal(int a, int b);  // 计算^
 
 int main() {
 
@@ -24,18 +29,24 @@ int main() {
         input.push_back(line);
     }
 
+    // 验证前两个函数
+    // for (string &exp : input) {
+    //
+    //     vector<string> test = inputFormat(exp);
+    //     vector<string> test2 = nifixFormat(test);
+    //     for (const string& exps : test2) {
+    //     cout << exps << " ";
+    //     }
+    //     cout << endl;
+    // }
+
+    // 输出结果
     for (string &exp : input) {
 
-        // 验证函数 inputFormat()
-        vector<string> test = inputFormat(exp);
-        vector<string> test2 = nifixFormat(test);
-        for (const string& exps : test2) {
-        cout << exps << "|";
-        }
-        cout << endl;
+        int output =  postfixCalulate(nifixFormat(inputFormat(exp)));
+        if (output == INT_MIN) cout << "INVALID" << endl;
+        else cout << output << endl;
     }
-
-    // cout << postfixCalulate(nifixFormat(inputFormat(exp))) << endl;
 
 }
 
@@ -79,6 +90,7 @@ vector<string> nifixFormat(const vector<string>& input) {
 // 如果遇到运算符（如 +, -, *, /, ^），根据优先级处理：
 // 如果栈为空，或者栈顶运算符的优先级低于当前运算符的优先级，将当前运算符压入栈中。
 // 如果栈顶运算符的优先级高于或等于当前运算符的优先级，弹出栈顶运算符并输出，然后重复检查，直到满足上述条件。
+//  当扫描完表达式后，依次弹出栈中剩余的所有运算符并输出。(会忘记这个)
 // [当前/栈顶]：【+-|+-】弹出【+-|*/】弹出【+-|^】弹出
 //            【*/|+-】压入【*/|*/】弹出【*/|^】弹出
 //            【^|+-】压入【^|*/】压入【^|^】弹出
@@ -106,39 +118,87 @@ vector<string> nifixFormat(const vector<string>& input) {
                     symbols.pop();
                 }
             }
-            else if(elem == "+" or elem == "-") {
-                string curr;
-                while (!symbols.empty() and curr != "(" ) {
-                    curr = symbols.top();  // 这步不能放在 pop后面哦，不然下面可能访问到空容器
+            else if(elem == "+" or elem == "-") {  // 这里面的处理顺序至关重要，稍不注意就会越界访问！
+                string curr = symbols.top();
+                while (curr != "(" ) {
                     output.push_back(curr);
                     symbols.pop();
+                    if (symbols.empty()) break;  // 防止下面的访问越界，这个条件不能和 while条件放在一起
+                    curr = symbols.top();
                 }
                 symbols.push(elem);
             }
             else if(elem == "*" or elem == "/") {
-                string curr;
-                while (!symbols.empty() and curr != "(" and curr != "+" and curr != "-") {
-                    curr = symbols.top();  // 这步不能放在 pop后面哦，不然下面可能访问到空容器
+                string curr = symbols.top();
+                while (curr != "(" and curr != "+" and curr != "-") {
                     output.push_back(curr);
                     symbols.pop();
+                    if (symbols.empty()) break;  // 防止下面的访问越界
+                    curr = symbols.top();
                 }
                 symbols.push(elem);
             }
             else if(elem == "^") {
-                string curr;
-                while (!symbols.empty() and curr != "(" and curr != "+" and curr != "-" and curr != "*" and curr != "/") {
-                    curr = symbols.top();  // 这步不能放在 pop后面哦，不然下面可能访问到空容器
+                string curr = symbols.top();
+                while (curr != "(" and curr != "+" and curr != "-" and curr != "*" and curr != "/") {
                     output.push_back(curr);
                     symbols.pop();
+                    if (symbols.empty()) break;  // 防止下面的访问越界
+                    curr = symbols.top();
                 }
                 symbols.push(elem);
             }
         }
     }
+
+    // 导入剩余运算符
+
+    while (!symbols.empty()) {
+        output.push_back(symbols.top());
+        symbols.pop();
+    }
+
     return output;
 
 }
 
 int postfixCalulate(vector<string> input) {
 
+    stack<string> stack;
+    for (string elem : input) {
+        if (isdigit(elem[0])) {  // 数字压入
+            stack.push(elem);
+        }
+        else { // 符号，计算，注意这里是反着拿出来的！！！！
+            int b = stoi(stack.top());
+            stack.pop();
+            int a = stoi(stack.top());
+            stack.pop();
+
+            int answer;
+            if (elem == "+") answer = a + b;
+            else if (elem == "-") answer = a - b;
+            else if (elem == "*") answer = a * b;
+            else if (elem == "/") {
+                if (b != 0) answer = a / b;
+                else return INT_MIN;
+            }
+            else if (elem == "^") answer = powerCal(a, b);
+            else abort();
+
+            stack.push(to_string(answer));
+        }
+    }
+
+    return stoi(stack.top());
+}
+
+int powerCal(int a, int b) {
+    int result = 1;
+    while (b > 0) {
+        if (b & 1) result *= a;
+        a *= a;
+        b >>= 1;
+    }
+    return result;
 }
