@@ -58,7 +58,8 @@ vector<string> inputFormat(string& input) {
     if(size == 0) return output;
 
     string storage;
-    for (int i = 0; i < size; i++) {  // 数字的结算标志有两个：符号、式子结束
+    for (int 
+    i = 0; i < size; i++) {  // 数字的结算标志有两个：符号、式子结束
         char currCh = input[i];
 
         if (!isdigit(currCh)){  // 符号结算
@@ -77,6 +78,7 @@ vector<string> inputFormat(string& input) {
         else {  // 数字不结算
             storage += currCh;
         }
+        
     }
 
     return output;
