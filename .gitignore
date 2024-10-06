@@ -34,6 +34,7 @@
 # 忽略 cmake 等 IDE 内容
 *cmake*
 CMakeLists.txt
+build/
 # .idea/
 # .vscode/
 bin/
