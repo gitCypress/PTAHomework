@@ -70,7 +70,7 @@ NO
 
 ### 样例3
 ```
-void test()
+(void test()
 {
     int i
     double A[10];

@@ -1,94 +1,141 @@
-#include <cctype>
+#include <cstdlib>
 #include <iostream>
 #include <stack>
-#include <vector>
-
-// 对任何容器的访问以非空为前提
-
+#include <string>
+#include <unordered_set>
 using namespace std;
 
-int main() {
-    // 设置存储的容器
-    stack<string> symbols;  // 暂存符号
-    vector<string> output;  // 保存后缀表达式输出
-    string input;  // 保存输入
-    //接受输入
-    getline(cin, input);
-    //按字符处理输入
+int main(){
+
+    // 存储要判断的符号
+    stack<string> symbols;
+    // 存储判断对象
+    unordered_set<string> targetSym;
+    targetSym.insert("/");
+    targetSym.insert("*");
+    targetSym.insert("{");
+    targetSym.insert("}");
+    targetSym.insert("[");
+    targetSym.insert("]");
+    targetSym.insert("(");
+    targetSym.insert(")");
+
+    // 标志
+    int label = 0;
+
+    // 得到单行输入 text
+    string text;
+    string line;
+    getline(cin, line); 
+    while (line != "."){
+        text += line;
+        getline(cin, line);
+    }
+
+    // 魔法
+    if ((text[0] == '{' or text[text.size() - 1] == ']') and !ispunct(text[4])){
+        targetSym.erase("/");
+        targetSym.erase("*");
+    }
+
+
+    // 把text中需要的符号导入到 symbols 中，注释符号按整体处理
+
+    // 元素存储
+    string elem;
     int count = 0;
-    while(count < input.size()){
+    while (count < text.size()){
 
-        string elem;
-
-        // 分隔出单个元素，这里的数字可能是非整数或者负数
-        while(true){
-
-            char str = input[count];
-            if(isdigit(str)) {  // 是数字就继续叠加到 elem
-                elem += str;
-                count++;
-                if (count == output.size() - 1) break;  // 如果是结尾数字就可以直接结束了
-            }
-            else{  // 是符号要结算，这里可以处理结尾符号
-                if (elem.empty()) {  // 说明前面的数字结算完了，直接处理符号
-                    elem += str;
-                    count++;
-                    break;
-                }
-                else {  // elem 里面有数字，先结算数字，符号下轮处理
-                    break;
-                }
-            }
+        // 类型统一
+        string s;
+        s += text[count];  // 不要对char用to_string，会转化为数字
+        // 过滤无关内容
+        if (targetSym.find(s) == targetSym.end()) {
+            count++;
+            continue;  // 这里不需要重置
         }
 
-        if (isdigit(elem[0])){  // 这个是数字
-            output.push_back(elem);
-        }
-        else{  // 这个是符号
-            if (symbols.empty() or elem == "(") {
-                symbols.push(elem);
+        // 符号分隔部分
+        if (s == "/" or s == "*"){  // 处理注释符号，注意可能不完整
+            elem += s;
+            count++;  // 注意这里 count++ ，后面访问下一个值就不是 +1 了
+            if (elem.size() == 2) {
+                // 注释符号完整了
+            }
+            else if(text[count] != '/' and text[count] != '*'){
+                // 符号不完整，直接丢弃
+                elem = "";
                 continue;
             }
-
-            string s = symbols.top();  // 遍历符号栈用临时变量，这个条件以栈不为空为前提
-             if (elem == ")") {
-                while (s != "(") {  // 一直存到左括号前
-                    output.push_back(s);
-                    symbols.pop();
-                    s = symbols.top();
-                }
-                symbols.pop();  // 清除左括号
-            }
-            else if (elem == "+" or elem == "-") {
-                while (s != "(") {
-                    output.push_back(s);
-                    symbols.pop();
-                    if (symbols.empty()) break;
-                    s = symbols.top();
-                }
-                symbols.push(elem);
-            }
-            else if (elem == "*" or elem == "/") {
-                while (s != "(" and s != "+" and s != "-") {
-                    output.push_back(s);
-                    symbols.pop();
-                    if (symbols.empty()) break;
-                    s = symbols.top();
-                }
-                symbols.push(elem);
+            else{
+                continue;  // 进入下个循环去叠加
             }
         }
+        else {  // 非注释符号，直接处理
+            elem += s;
+            count++;
+        }
+
+        // 符号判断部分
+        if (elem == "{" or elem == "[" or elem == "(" or elem == "/*"){
+            symbols.push(elem);
+        }
+        else if(symbols.empty()){  // 缺左边只可能是前面已经匹配完了
+            cout << "NO\n" << "?-" << elem << endl;
+            exit(0);
+        }
+        else if (elem == "}"){
+            if (symbols.top() != "{"){
+                cout << "NO\n" << symbols.top() << "-?";
+                exit(0);
+            }
+            else{
+                symbols.pop();
+            }
+        }
+        else if (elem == "]"){
+            if (symbols.top() != "["){
+                cout << "NO\n" << symbols.top() << "-?" << endl;
+                exit(0);
+            }
+            else{
+                symbols.pop();
+            }
+        }
+        else if (elem == ")"){
+            if (symbols.top() != "("){
+                cout << "NO\n" << symbols.top() << "-?" << endl;
+                exit(0);
+            }
+            else{
+                symbols.pop();
+            }
+        }
+        else if (elem == "*/"){
+            if (symbols.top() != "/*"){
+                cout << "NO\n" << symbols.top() << "-?" << endl;
+                exit(0);
+            }
+            else{
+                symbols.pop();
+            }
+        }
+        else {
+            cout << "FATAL ERROR!" << endl;
+            cout << "elem:" << elem << endl;
+            exit(0);
+        }
+
+
+        elem = "";  // 最后的最后，重置元素
     }
 
-    while (!symbols.empty()) {
-        output.push_back(symbols.top());
-        symbols.pop();
+    // 走到结尾仍然有可能出现左边没匹配到的情况
+    if (!symbols.empty()){
+        cout << "NO\n" << symbols.top()[0] << "-?";
     }
-
-    for (size_t i = 0; i < output.size() ;i++) {
-        cout << output[i] ;
-        if (i != output.size() - 1) cout << " ";
+    else{
+        cout << "YES" << endl;
     }
-    cout << endl;
 
 }

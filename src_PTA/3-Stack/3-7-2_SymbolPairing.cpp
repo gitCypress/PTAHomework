@@ -2,9 +2,12 @@
 // Created by DesCypress on 24-10-5.
 //
 
+#include <cstddef>
 #include <iostream>
 #include <unordered_set>
 #include <stack>
+#include <vector>
+#include <string>
 
 using namespace std;
 unordered_set<char> targetSymbol;
@@ -29,13 +32,18 @@ int main() {
 
     stack<int> symbols;
 
+    // 注释判断标记
+    vector<string> tipStorage;
+    int tsCount = 0;
+
     string line;  // 结尾判断用的行就没办法了
     int tips[4] = {0, 0, 0, 0};  // 专门用来记录注释情况，默认注释里面不会有注释符号
     getline(cin, line);
     while (line != ".") {  // 行读取循环
 
-        for (char c :line) {  // 行内字符读取循环
+        for (size_t i = 0; i < line.size(); i++) {  // 行内字符读取循环
 
+            char c = line[i];
             // 其他字符，跳过
             if (targetSymbol.find(c) == targetSymbol.end()) {}
 
@@ -44,12 +52,14 @@ int main() {
                 symbols.push(c);
             }
 
-            // 注释符号（不去考虑注释内塞符号的诡异情况，注意注释符号可能为运算符的情况）
-            // 这部分太难处理了，稍后
-
+            // 注释符号?
+            else if (c == '/' or c == '*') {
+            
+            }
+            
             // 栈为空
             else if (symbols.empty()) {
-                cout << "NO\n" << "?-" << c <<endl;
+                cout << "NO\n" << "?-" << c << endl;
                 exit(0);
             }
 
