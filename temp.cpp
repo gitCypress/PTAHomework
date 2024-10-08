@@ -4,19 +4,24 @@
 using namespace std;
 
 int main(){
-    SeQueue newQueue(5);
+    SeQueue newSeQueue(5);
 
-    newQueue << 1 << 2 << 3 << 4 << 5;
-    cout << newQueue << newQueue << newQueue << newQueue << newQueue;
+    newSeQueue << 1 << 2 << 3 << 4 << 5;
     
-    // exit(0);
-
-    ListQueue newQueue2;
-    newQueue2 << 1 << 2 << 3;
-
-    while (!newQueue2.empty()) {
-        cout << newQueue2.top() << " ";
-        newQueue2.pop();
+    while (!newSeQueue.empty()) {
+        cout << newSeQueue.top() << " ";
+        newSeQueue.pop();
     }
+    cout << endl;
+    
+
+    ListQueue newListQueue;
+    newListQueue << 1 << 2 << 3;
+
+    while (!newListQueue.empty()) {
+        cout << newListQueue.top() << " ";
+        newListQueue.pop();
+    }
+    cout << endl;   `
 
 }
