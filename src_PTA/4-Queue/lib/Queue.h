@@ -33,7 +33,7 @@ public:
 
     status push(int input);
     status pop();
-    int size() const {return (rear_ -front_ + maxSize_) % maxSize_;};
+    int size() const {return (rear_ - front_ + maxSize_) % maxSize_;};
     bool empty() const {return rear_ == front_;};
     bool full() const {return (rear_ + 1) % maxSize_ == front_;};
     void clear() {front_ = 0; rear_ = 0;};  // 并不需要清掉数据

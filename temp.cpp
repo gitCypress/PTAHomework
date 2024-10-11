@@ -13,7 +13,6 @@ int main(){
         newSeQueue.pop();
     }
     cout << endl;
-    
 
     ListQueue newListQueue;
     newListQueue << 1 << 2 << 3;
@@ -22,6 +21,6 @@ int main(){
         cout << newListQueue.top() << " ";
         newListQueue.pop();
     }
-    cout << endl;   `
+    cout << endl;   
 
 }
