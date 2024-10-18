@@ -1,26 +1,15 @@
-#include <Queue.h>
-#include <cstdlib>
+#include "String.h"
 #include <iostream>
+#include <vector>
+
 using namespace std;
 
 int main(){
-    SeQueue newSeQueue(5);
+    string t = "abacabab";
+    string s = "aababababa";
 
-    newSeQueue << 1 << 2 << 3 << 4 << 5;
-    
-    while (!newSeQueue.empty()) {
-        cout << newSeQueue.top() << " ";
-        newSeQueue.pop();
+    vector<int> next = nextGe(t);
+    for (int i : next){
+        cout << i << " ";
     }
-    cout << endl;
-
-    ListQueue newListQueue;
-    newListQueue << 1 << 2 << 3;
-
-    while (!newListQueue.empty()) {
-        cout << newListQueue.top() << " ";
-        newListQueue.pop();
-    }
-    cout << endl;   
-
 }
