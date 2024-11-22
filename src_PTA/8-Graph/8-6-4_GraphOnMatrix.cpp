@@ -7,8 +7,6 @@ typedef struct{
 }AMGraph;
 
 void CreateUDN(AMGraph &G);
-void Prim(AMGraph G, char u);
-
 int main(){
     AMGraph G;     
     int i, j, sum=0;
@@ -16,7 +14,7 @@ int main(){
     for(i = 0 ; i < G.vexnum ; ++i){
         sum=0;
         for(j = 0; j < G.vexnum; ++j){
-            if(G.arcs[i][j] == 1)
+            if(G.arcs[i][j]==1)
                 sum+=1;
         }
         if(i==0)
@@ -44,23 +42,18 @@ void CreateUDN(AMGraph &G){
 
     for (int i = 0; i < G.vexnum; i++){
         for (int j = 0; j < G.vexnum; j++){
-            if (i == j) G.arcs[i][j] = 0;
-            else G.arcs[i][j] = 65535;
+            G.arcs[i][j] = 0;
         }
     }
 
     for (int i = 0; i < G.arcnum; i++){
         char head, tail;
-        int cost;
-        cin >> head >> tail >> cost;
+        cin >> head >> tail;
         int headIndex = indexMap[head], tailIndex = indexMap[tail];
 
-        G.arcs[headIndex][tailIndex] = cost;
-        G.arcs[tailIndex][headIndex] = cost;
+        G.arcs[headIndex][tailIndex] = 1;
+        G.arcs[tailIndex][headIndex] = 1;
+
     }
 
-}
-
-void Prim(AMGraph G, char u){
-        
 }
