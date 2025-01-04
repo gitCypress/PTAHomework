@@ -11,10 +11,7 @@ int find(string& source, string& target){
 
     while(sp < source.size()){
 
-        if (tp == target.size()){
-            return sp - tp;
-        }
-        else if(source[sp] == target[tp]){
+        if(source[sp] == target[tp]){
             sp++;
             tp++;
         }
@@ -23,6 +20,10 @@ int find(string& source, string& target){
         }
         else {
             tp = next[tp - 1];
+        }
+
+        if (tp == target.size()){
+            return sp - tp;
         }
     }
 
@@ -36,7 +37,7 @@ vector<int> nextGe(string& target){
     int ep = 1;
     int coPrefix = 0;
 
-    while(ep != target.size()){
+    while(ep < target.size()){
         if(target[coPrefix] == target[ep]){
             ep++;
             coPrefix++;

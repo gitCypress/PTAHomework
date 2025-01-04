@@ -1,91 +1,67 @@
-#include <unordered_map>
-#include <unordered_set>
-#include <cmath>
-#include <list>
-#include <iostream>
-using namespace std;
-/*
-00100 5
-99999 -7 87654
-23854 -15 00000
-87654 15 -1
-00000 -15 99999
-00100 21 23854
+#include <stdio.h>
 
-00100 21 23854
-23854 -15 99999
-99999 -7 -1
-00000 -15 87654
-87654 15 -1
-*/
+#define MAXTABLESIZE 100000  /* 允许开辟的最大散列表长度 */
+typedef int ElementType; /* 关键词类型用整型 */
+typedef int Index; /* 散列地址类型 */
+typedef Index Position; /* 数据所在位置与散列地址是同一类型 */
+/* 散列单元状态类型，分别对应：有合法元素、空单元、有已删除元素 */
+typedef enum { Legitimate, Empty, Deleted } EntryType;
 
-struct fakeLNode{
-    string addr;
-    int data;
-    string next;
+typedef struct HashEntry Cell; /* 散列表单元类型 */
+struct HashEntry {
+    ElementType Data; /* 存放元素 */
+    EntryType Info; /* 单元状态 */
 };
 
-void print(list<fakeLNode> flist);
+typedef struct TblNode *HashTable; /* 散列表类型 */
+struct TblNode {
+    /* 散列表结点定义 */
+    int TableSize; /* 表的最大长度 */
+    Cell Cells[]; /* 存放散列单元数据的数组 */
+};
 
-int main(){
-
-    // 导入初始数据
-    string head;
-    int size;
-    cin >> head >> size;
-
-    // 用字典创建一张伪表
-    unordered_map<string, fakeLNode> fakeList;
-    for (int i = 0; i < size; i++){
-        int data;
-        string addr, next;
-        cin >> addr >> data >> next;
-        fakeList[addr] = fakeLNode{addr, data, next};
-    }
-
-    // 把伪表转化成真表，后面好操作
-    auto p = head;
-    list<fakeLNode> realList;
-    while (p != "-1"){
-        realList.push_back(fakeList[p]);
-        p = fakeList[p].next;
-    }
-
-    // for(auto i : realList){
-    //     cout << i.addr << " " << i.data << " " << i.next << endl;
-    // }
-    // return 0;
-
-    // 除去绝对值重复元素
-    auto itr = realList.begin();
-    unordered_set<int> record;
-    list<fakeLNode> wastedList;
-    while (itr != realList.end()){
-        if (record.find(abs(itr->data)) != record.end()) {
-            wastedList.push_back(*itr);
-            itr = realList.erase(itr);
-        }else{
-            record.insert(abs(itr->data));
-            itr++;
-        }
-    }
-
-    // 打印表数据，注意结尾-1的处理
-    print(realList);
-    print(wastedList);
-
+HashTable BuildTable(); /* 裁判实现，细节不表 */
+Position Hash(ElementType Key, int TableSize) {
+    return (Key % TableSize);
 }
 
-void print(list<fakeLNode> flist){
-    auto p = flist.begin();
-    auto p2 = p;
-    p2++;
+#define ERROR -1
 
-    while (p2 != flist.end()){
-        cout << p->addr << " " << p->data << " " << p2->addr << endl;
-        p++;
-        p2++;
+Position Find(HashTable H, ElementType Key);
+
+int main() {
+    HashTable H;
+    ElementType Key;
+    Position P;
+
+    H = BuildTable();
+    scanf("%d", &Key);
+    P = Find(H, Key);
+    if (P == ERROR)
+        printf("ERROR: %d is not found and the table is full.\n", Key);
+    else if (H->Cells[P].Info == Legitimate)
+        printf("%d is at position %d.\n", Key, P);
+    else
+        printf("%d is not found.  Position %d is returned.\n", Key, P);
+
+    return 0;
+}
+
+/* 你的代码将被嵌在这里 */
+Position Find(HashTable H, ElementType Key) {
+
+    Position addr = Hash(Key, H->TableSize);
+
+    for (int i = 0; i < H->TableSize; i++) {
+
+        if (H->Cells[addr].Info == Empty) return addr;
+
+        if (H->Cells[addr].Info == Legitimate
+            && H->Cells[addr].Data == Key) return addr;
+
+        addr = (addr + 1) % H->TableSize;
     }
-    cout << p->addr << " " << p->data << " " << "-1" << endl;
+
+    return ERROR;
 
 }
