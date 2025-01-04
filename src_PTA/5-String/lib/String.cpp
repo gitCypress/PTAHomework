@@ -3,7 +3,7 @@
 
 #define UNKNOWN -1
 
-int find(string& source, string& target){
+int findMy(string& source, string& target){
 
     vector<int> next = nextGe(target);
     int sp = 0;
